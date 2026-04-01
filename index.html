@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>🌙 小月亮 · 连续记录经期</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #fef7e8;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Georgia', 'Times New Roman', serif;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .journal {
+            max-width: 550px;
+            margin: 0 auto;
+            background: #fffef7;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .journal::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, #f5e6d3, #e8d9c4);
+            border-radius: 4px 0 0 4px;
+        }
+
+        .pages {
+            padding: 24px 20px 32px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 28px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f0e5d6;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            color: #c4a27a;
+        }
+
+        .header h1 span {
+            font-size: 28px;
+            display: inline-block;
+        }
+
+        .header p {
+            font-size: 12px;
+            color: #d4b48c;
+            margin-top: 6px;
+            letter-spacing: 1px;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding: 12px 8px;
+            background: #fef9ef;
+            border-radius: 48px;
+            cursor: pointer;
+        }
+
+        .stat-mini {
+            text-align: center;
+            flex: 1;
+            transition: all 0.2s;
+            border-radius: 40px;
+            padding: 4px;
+        }
+
+        .stat-mini:active {
+            background: #fef0e0;
+            transform: scale(0.98);
+        }
+
+        .stat-mini-label {
+            font-size: 11px;
+            color: #d4b48c;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-mini-value {
+            font-size: 20px;
+            font-weight: 400;
+            color: #c4a27a;
+            margin-top: 4px;
+            font-family: 'Georgia', monospace;
+        }
+
+        .egg-badge {
+            display: inline-block;
+            font-size: 10px;
+            margin-left: 4px;
+            opacity: 0.6;
+        }
+
+        .month-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 20px;
+            padding: 0 8px;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #e2cdb0;
+            cursor: pointer;
+            padding: 4px 12px;
+            transition: all 0.2s;
+            font-family: monospace;
+        }
+
+        .nav-btn:active {
+            color: #c4a27a;
+            transform: scale(0.9);
+        }
+
+        .month-title {
+            font-size: 20px;
+            font-weight: 400;
+            color: #b88d5e;
+            letter-spacing: 1px;
+        }
+
+        .month-sub {
+            font-size: 12px;
+            color: #e2cdb0;
+            margin-left: 8px;
+        }
+
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            margin-bottom: 12px;
+            padding: 0 4px;
+        }
+
+        .weekday {
+            font-size: 11px;
+            color: #e2cdb0;
+            padding: 8px 0;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 20px;
+        }
+
+        .day-cell {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 400;
+            color: #9b7b5c;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            font-family: 'Georgia', monospace;
+            background: transparent;
+        }
+
+        .day-cell:active {
+            transform: scale(0.92);
+            background: #fef5e8;
+        }
+
+        .day-cell.period .moon-icon {
+            font-size: 28px;
+            line-height: 1;
+            display: block;
+            margin-bottom: -2px;
+            filter: drop-shadow(0 2px 4px rgba(200, 150, 100, 0.2));
+        }
+
+        .day-cell.period .day-number {
+            font-size: 11px;
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #c4a27a;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 0 2px;
+            border-radius: 10px;
+        }
+
+        .day-cell.predicted .moon-icon {
+            font-size: 26px;
+            line-height: 1;
+            display: block;
+            margin-bottom: -2px;
+            filter: drop-shadow(0 2px 4px rgba(200, 150, 100, 0.15));
+            opacity: 0.85;
+        }
+
+        .day-cell.predicted .day-number {
+            font-size: 11px;
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #d4b48c;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 0 2px;
+            border-radius: 10px;
+        }
+
+        .day-number {
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+
+        .day-cell.today {
+            position: relative;
+        }
+
+        .day-cell.today .day-number {
+            color: #e8a87c;
+            font-weight: 500;
+        }
+
+        .day-cell.today::after {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            width: 4px;
+            height: 4px;
+            background: #e8a87c;
+            border-radius: 50%;
+        }
+
+        .day-cell.other-month {
+            opacity: 0.35;
+        }
+
+        .day-cell.editing {
+            background: #fff0e0;
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(200, 150, 100, 0.2);
+        }
+
+        .action-hint {
+            background: #fef9ef;
+            border-radius: 40px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            text-align: center;
+            font-size: 12px;
+            color: #d4b48c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .hint-badge {
+            background: white;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            color: #c4a27a;
+        }
+
+        .editing-badge {
+            background: #fff5e8;
+            border-radius: 20px;
+            padding: 10px 15px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #b88d5e;
+            border-left: 3px solid #e8a87c;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cancel-edit {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #ecdbba;
+            cursor: pointer;
+            padding: 0 8px;
+        }
+
+        .prediction-info {
+            background: #fef5e8;
+            border-radius: 16px;
+            padding: 10px 15px;
+            margin-bottom: 16px;
+            font-size: 12px;
+            color: #b88d5e;
+            text-align: center;
+            border: 1px solid #f5ecd9;
+        }
+
+        .history-mini {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #f5ecd9;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            font-size: 12px;
+            color: #b88d5e;
+            border-bottom: 1px dashed #f5ecd9;
+        }
+
+        .delete-mini {
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: #ecdbba;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        .toast-message {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(196, 162, 122, 0.95);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 13px;
+            z-index: 1000;
+            animation: toastFade 2s ease;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        @keyframes toastFade {
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
+
+        .egg-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(254, 247, 232, 0.96);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .egg-modal.show {
+            display: flex;
+        }
+
+        .egg-card {
+            background: #fffef7;
+            border-radius: 48px;
+            max-width: 400px;
+            width: 100%;
+            padding: 32px 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid #f5ecd9;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .egg-close {
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            font-size: 24px;
+            color: #ecdbba;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .egg-title {
+            text-align: center;
+            font-size: 20px;
+            color: #c4a27a;
+            margin-bottom: 24px;
+            letter-spacing: 2px;
+        }
+
+        .trend-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 16px;
+            min-height: 200px;
+            padding: 20px 0;
+            overflow-x: auto;
+        }
+
+        .trend-bar-item {
+            text-align: center;
+            min-width: 50px;
+        }
+
+        .bar {
+            width: 32px;
+            background: linear-gradient(180deg, #f0d8be, #e8caa8);
+            border-radius: 16px 16px 4px 4px;
+            transition: height 0.3s;
+            margin: 0 auto;
+        }
+
+        .bar-label {
+            font-size: 11px;
+            color: #d4b48c;
+            margin-top: 8px;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #ecdbba;
+            padding: 40px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 480px) {
+            .pages {
+                padding: 20px 16px 28px;
+            }
+            .day-cell.period .moon-icon,
+            .day-cell.predicted .moon-icon {
+                font-size: 24px;
+            }
+            .calendar-grid {
+                gap: 2px;
+            }
+            .toast-message {
+                font-size: 12px;
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="journal">
+        <div class="pages">
+            <div class="header">
+                <h1><span>🌙</span> 小月亮</h1>
+                <p>记录与预测经期^ ^</p>
+            </div>
+
+            <div class="stats-row" id="statsRow">
+                <div class="stat-mini" id="avgCycleStat">
+                    <div class="stat-mini-label">平均周期 <span class="egg-badge">🥚</span></div>
+                    <div class="stat-mini-value" id="avgCycle">--</div>
+                </div>
+                <div class="stat-mini">
+                    <div class="stat-mini-label">平均经期</div>
+                    <div class="stat-mini-value" id="avgPeriod">--</div>
+                </div>
+                <div class="stat-mini">
+                    <div class="stat-mini-label">记录次数</div>
+                    <div class="stat-mini-value" id="recordCount">0</div>
+                </div>
+            </div>
+
+            <div class="prediction-info" id="predictionInfo">
+                💡 记录2次以上即可显示预测
+            </div>
+
+            <div class="month-nav">
+                <button class="nav-btn" onclick="prevMonth()">←</button>
+                <div>
+                    <span class="month-title" id="monthTitle">1月</span>
+                    <span class="month-sub" id="yearSub">2024</span>
+                </div>
+                <button class="nav-btn" onclick="nextMonth()">→</button>
+            </div>
+
+            <div class="weekdays">
+                <span class="weekday">一</span><span class="weekday">二</span><span class="weekday">三</span>
+                <span class="weekday">四</span><span class="weekday">五</span><span class="weekday">六</span>
+                <span class="weekday">日</span>
+            </div>
+
+            <div class="calendar-grid" id="calendarGrid"></div>
+
+            <div class="action-hint">
+                <span>✨ 第一次点击：开始</span>
+                <span class="hint-badge">第二次点击：结束</span>
+            </div>
+
+            <div id="editingPanel" style="display: none;" class="editing-badge">
+                <span>📝 正在记录：<span id="editingDates"></span></span>
+                <button class="cancel-edit" onclick="cancelEditing()">✕</button>
+            </div>
+
+            <div class="history-mini" id="historyMini">
+                <div style="text-align:center;color:#ecdbba;font-size:12px;padding:8px">✨ 点击两次日期记录经期 ✨</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="egg-modal" id="eggModal">
+        <div class="egg-card">
+            <button class="egg-close" onclick="closeEgg()">✕</button>
+            <div class="egg-title">📈 周期趋势彩蛋 🥚</div>
+            <div id="trendContent" class="trend-chart"></div>
+            <div class="egg-footer" style="text-align:center;margin-top:20px;font-size:11px;color:#ecdbba;">点击"平均周期"触发的彩蛋 ✨</div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'little_moon_periods_v6';
+        
+        // 使用当前日期的示例数据
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        const currentMonth = today.getMonth();
+        
+        // 创建合理的示例数据（最近两个月的记录）
+        const lastMonthStart = new Date(currentYear, currentMonth - 1, 10);
+        const lastMonthEnd = new Date(currentYear, currentMonth - 1, 15);
+        const thisMonthStart = new Date(currentYear, currentMonth, 7);
+        const thisMonthEnd = new Date(currentYear, currentMonth, 12);
+        
+        const sampleData = [
+            { 
+                start: formatDateStatic(lastMonthStart), 
+                end: formatDateStatic(lastMonthEnd) 
+            },
+            { 
+                start: formatDateStatic(thisMonthStart), 
+                end: formatDateStatic(thisMonthEnd) 
+            }
+        ];
+        
+        function formatDateStatic(date) {
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        }
+
+        let currentViewYear = today.getFullYear();
+        let currentViewMonth = today.getMonth();
+        
+        let isEditing = false;
+        let editStartDate = null;
+        let editEndDate = null;
+
+        function getRecords() {
+            const records = localStorage.getItem(STORAGE_KEY);
+            if (records) {
+                return JSON.parse(records);
+            } else {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(sampleData));
+                return sampleData;
+            }
+        }
+
+        function saveRecords(records) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+            updateAll();
+        }
+
+        function dateDiff(start, end) {
+            return Math.ceil((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24)) + 1;
+        }
+
+        function formatDate(year, month, day) {
+            return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        }
+
+        // 计算平均周期
+        function calcAvgCycle(records) {
+            if (records.length < 2) return null;
+            let cycles = [];
+            for (let i = 1; i < records.length; i++) {
+                const startPrev = new Date(records[i-1].start);
+                const startCurr = new Date(records[i].start);
+                const cycle = Math.round((startCurr - startPrev) / (1000 * 60 * 60 * 24));
+                cycles.push(cycle);
+            }
+            const avg = Math.round(cycles.reduce((a, b) => a + b, 0) / cycles.length);
+            return avg;
+        }
+
+        // 计算平均经期
+        function calcAvgPeriod(records) {
+            if (records.length === 0) return null;
+            const durations = records.map(r => dateDiff(r.start, r.end));
+            return Math.round(durations.reduce((a, b) => a + b, 0) / durations.length);
+        }
+
+        // 预测下次经期 - 修复版
+        function predictNextPeriod(records) {
+            if (records.length < 2) {
+                return null;
+            }
+            
+            // 按开始日期排序
+            const sortedRecords = [...records].sort((a, b) => new Date(a.start) - new Date(b.start));
+            const avgCycle = calcAvgCycle(sortedRecords);
+            const avgPeriod = calcAvgPeriod(sortedRecords);
+            
+            if (!avgCycle) return null;
+            
+            // 获取最后一次经期的开始日期
+            const lastStart = new Date(sortedRecords[sortedRecords.length - 1].start);
+            
+            // 计算下次经期开始日期
+            const nextStart = new Date(lastStart);
+            nextStart.setDate(lastStart.getDate() + avgCycle);
+            
+            // 计算下次经期结束日期
+            const nextEnd = new Date(nextStart);
+            if (avgPeriod) {
+                nextEnd.setDate(nextStart.getDate() + avgPeriod - 1);
+            }
+            
+            return { 
+                start: nextStart, 
+                end: nextEnd, 
+                cycle: avgCycle, 
+                period: avgPeriod 
+            };
+        }
+
+        // 获取某月的经期日期集合
+        function getPeriodDays(year, month) {
+            const records = getRecords();
+            const days = new Set();
+            
+            records.forEach(record => {
+                const start = new Date(record.start);
+                const end = new Date(record.end);
+                const current = new Date(start);
+                while (current <= end) {
+                    if (current.getFullYear() === year && current.getMonth() === month) {
+                        days.add(current.getDate());
+                    }
+                    current.setDate(current.getDate() + 1);
+                }
+            });
+            return days;
+        }
+
+        // 获取预测的日期集合
+        function getPredictedDays(year, month) {
+            const records = getRecords();
+            const prediction = predictNextPeriod(records);
+            
+            if (!prediction) return new Set();
+            
+            const days = new Set();
+            const current = new Date(prediction.start);
+            const end = new Date(prediction.end);
+            
+            while (current <= end) {
+                if (current.getFullYear() === year && current.getMonth() === month) {
+                    days.add(current.getDate());
+                }
+                current.setDate(current.getDate() + 1);
+            }
+            
+            return days;
+        }
+
+        // 添加连续经期记录
+        function addPeriodRange(startDate, endDate) {
+            const records = getRecords();
+            
+            // 删除与新区间重叠的旧记录
+            const filteredRecords = records.filter(record => {
+                const recordStart = new Date(record.start);
+                const recordEnd = new Date(record.end);
+                return !(recordEnd >= startDate && recordStart <= endDate);
+            });
+            
+            // 添加新区间
+            const startStr = formatDate(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+            const endStr = formatDate(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+            filteredRecords.push({ start: startStr, end: endStr });
+            filteredRecords.sort((a, b) => new Date(a.start) - new Date(b.start));
+            
+            saveRecords(filteredRecords);
+            return dateDiff(startStr, endStr);
+        }
+
+        function handleDayClick(day, isCurrentMonth) {
+            if (!isCurrentMonth) return;
+            
+            const clickedDate = new Date(currentViewYear, currentViewMonth, day);
+            
+            if (!isEditing) {
+                isEditing = true;
+                editStartDate = clickedDate;
+                editEndDate = clickedDate;
+                updateEditingPanel();
+                showToast(`🌙 开始：${currentViewMonth+1}/${day}，再点击结束日期`);
+            } else {
+                if (clickedDate < editStartDate) {
+                    editEndDate = editStartDate;
+                    editStartDate = clickedDate;
+                } else {
+                    editEndDate = clickedDate;
+                }
+                
+                updateEditingPanel();
+                const duration = addPeriodRange(editStartDate, editEndDate);
+                showToast(`✓ 已记录 ${duration} 天经期`);
+                cancelEditing();
+            }
+        }
+
+        function updateEditingPanel() {
+            if (isEditing && editStartDate) {
+                const startStr = `${editStartDate.getMonth()+1}/${editStartDate.getDate()}`;
+                const endStr = editEndDate ? `${editEndDate.getMonth()+1}/${editEndDate.getDate()}` : startStr;
+                document.getElementById('editingDates').textContent = `${startStr} - ${endStr}`;
+                document.getElementById('editingPanel').style.display = 'flex';
+            } else {
+                document.getElementById('editingPanel').style.display = 'none';
+            }
+        }
+
+        function cancelEditing() {
+            isEditing = false;
+            editStartDate = null;
+            editEndDate = null;
+            updateEditingPanel();
+            document.querySelectorAll('.day-cell.editing').forEach(cell => {
+                cell.classList.remove('editing');
+            });
+        }
+
+        function showToast(message) {
+            const existingToast = document.querySelector('.toast-message');
+            if (existingToast) existingToast.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast-message';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 2000);
+        }
+
+        function renderCalendar() {
+            const firstDay = new Date(currentViewYear, currentViewMonth, 1);
+            const lastDay = new Date(currentViewYear, currentViewMonth + 1, 0);
+            let startWeekday = firstDay.getDay();
+            startWeekday = startWeekday === 0 ? 7 : startWeekday;
+            const daysInMonth = lastDay.getDate();
+            
+            const periodDays = getPeriodDays(currentViewYear, currentViewMonth);
+            const predictedDays = getPredictedDays(currentViewYear, currentViewMonth);
+            const today = new Date();
+            const isCurrentMonth = today.getFullYear() === currentViewYear && today.getMonth() === currentViewMonth;
+            const todayDate = today.getDate();
+            
+            let daysHtml = '';
+            
+            // 填充上月日期
+            const prevMonthLastDay = new Date(currentViewYear, currentViewMonth, 0).getDate();
+            for (let i = startWeekday - 1; i > 0; i--) {
+                const dayNum = prevMonthLastDay - i + 1;
+                daysHtml += `<div class="day-cell other-month"><span class="day-number">${dayNum}</span></div>`;
+            }
+            
+            // 当月日期
+            for (let d = 1; d <= daysInMonth; d++) {
+                let classes = 'day-cell';
+                let innerHtml = '';
+                
+                if (periodDays.has(d)) {
+                    classes += ' period';
+                    innerHtml = `<div class="moon-icon">🌕</div><div class="day-number">${d}</div>`;
+                } else if (predictedDays.has(d)) {
+                    classes += ' predicted';
+                    innerHtml = `<div class="moon-icon">🌙</div><div class="day-number">${d}</div>`;
+                } else {
+                    innerHtml = `<span class="day-number">${d}</span>`;
+                }
+                
+                if (isCurrentMonth && d === todayDate) {
+                    classes += ' today';
+                }
+                
+                if (isEditing && editStartDate) {
+                    const cellDate = new Date(currentViewYear, currentViewMonth, d);
+                    if (editEndDate) {
+                        if (cellDate >= editStartDate && cellDate <= editEndDate) {
+                            classes += ' editing';
+                        }
+                    } else if (cellDate.getTime() === editStartDate.getTime()) {
+                        classes += ' editing';
+                    }
+                }
+                
+                const onclickAttr = `onclick="handleDayClick(${d}, true)"`;
+                daysHtml += `<div class="${classes}" ${onclickAttr}>${innerHtml}</div>`;
+            }
+            
+            // 填充下月日期
+            const totalCells = Math.ceil((startWeekday - 1 + daysInMonth) / 7) * 7;
+            const remaining = totalCells - (startWeekday - 1 + daysInMonth);
+            for (let i = 1; i <= remaining; i++) {
+                daysHtml += `<div class="day-cell other-month"><span class="day-number">${i}</span></div>`;
+            }
+            
+            document.getElementById('calendarGrid').innerHTML = daysHtml;
+            document.getElementById('monthTitle').textContent = (currentViewMonth + 1) + '月';
+            document.getElementById('yearSub').textContent = currentViewYear;
+        }
+
+        function updatePredictionInfo() {
+            const records = getRecords();
+            const prediction = predictNextPeriod(records);
+            const infoDiv = document.getElementById('predictionInfo');
+            
+            if (records.length < 2) {
+                infoDiv.innerHTML = '💡 再记录1次，即可显示预测 🌙';
+                infoDiv.style.background = '#fef5e8';
+                return;
+            }
+            
+            if (prediction) {
+                const startStr = `${prediction.start.getMonth()+1}/${prediction.start.getDate()}`;
+                const endStr = `${prediction.end.getMonth()+1}/${prediction.end.getDate()}`;
+                const today = new Date();
+                const daysUntil = Math.round((prediction.start - today) / (1000 * 60 * 60 * 24));
+                
+                if (daysUntil > 0) {
+                    infoDiv.innerHTML = `🌙 预测下次经期：${startStr} - ${endStr} (还有${daysUntil}天)`;
+                } else if (daysUntil === 0) {
+                    infoDiv.innerHTML = `🌙 预测经期：${startStr} - ${endStr} (今天开始)`;
+                } else {
+                    infoDiv.innerHTML = `🌙 预测经期：${startStr} - ${endStr}`;
+                }
+                infoDiv.style.background = '#fff0e0';
+            } else {
+                infoDiv.innerHTML = '💡 记录2次以上即可显示预测';
+                infoDiv.style.background = '#fef5e8';
+            }
+        }
+
+        function showEggTrend() {
+            const records = getRecords();
+            const modal = document.getElementById('eggModal');
+            const trendContent = document.getElementById('trendContent');
+            
+            if (records.length < 2) {
+                trendContent.innerHTML = '<div class="no-data">🌸 记录2次以上即可查看周期趋势 🌸</div>';
+                modal.classList.add('show');
+                return;
+            }
+            
+            let cycles = [];
+            for (let i = 1; i < records.length; i++) {
+                const cycle = Math.round((new Date(records[i].start) - new Date(records[i-1].start)) / (1000 * 60 * 60 * 24));
+                cycles.push(cycle);
+            }
+            
+            const maxCycle = Math.max(...cycles, 30);
+            const trendHtml = cycles.map((cycle, idx) => {
+                const height = (cycle / maxCycle) * 100 + 30;
+                const startDate = new Date(records[idx + 1].start);
+                const monthLabel = `${startDate.getMonth()+1}/${startDate.getDate()}`;
+                return `
+                    <div class="trend-bar-item">
+                        <div class="bar" style="height: ${height}px"></div>
+                        <div class="bar-label">${cycle}天<br>${monthLabel}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            trendContent.innerHTML = trendHtml;
+            modal.classList.add('show');
+        }
+
+        function closeEgg() {
+            document.getElementById('eggModal').classList.remove('show');
+        }
+
+        function updateStats() {
+            const records = getRecords();
+            const avgCycle = calcAvgCycle(records);
+            const avgPeriod = calcAvgPeriod(records);
+            
+            document.getElementById('avgCycle').textContent = avgCycle || '--';
+            document.getElementById('avgPeriod').textContent = avgPeriod || '--';
+            document.getElementById('recordCount').textContent = records.length;
+        }
+
+        function updateHistory() {
+            const records = getRecords();
+            const historyDiv = document.getElementById('historyMini');
+            
+            // 只显示最近3条记录
+            const recentRecords = [...records].reverse().slice(0, 3);
+            
+            if (recentRecords.length === 0) {
+                historyDiv.innerHTML = '<div style="text-align:center;color:#ecdbba;font-size:12px;padding:8px">✨ 点击两次日期记录经期 ✨</div>';
+                return;
+            }
+            
+            historyDiv.innerHTML = recentRecords.map((record, idx) => {
+                const duration = dateDiff(record.start, record.end);
+                const recordIndex = records.findIndex(r => r.start === record.start && r.end === record.end);
+                return `
+                    <div class="history-item">
+                        <span>🌙 ${record.start} ~ ${record.end} (${duration}天)</span>
+                        <button class="delete-mini" onclick="deleteRecord(${recordIndex})">🗑️</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function deleteRecord(index) {
+            if (confirm('删除这条记录？')) {
+                const records = getRecords();
+                records.splice(index, 1);
+                saveRecords(records);
+                showToast('✓ 已删除');
+            }
+        }
+
+        function prevMonth() {
+            cancelEditing();
+            if (currentViewMonth === 0) {
+                currentViewMonth = 11;
+                currentViewYear--;
+            } else {
+                currentViewMonth--;
+            }
+            renderCalendar();
+            updateHistory();
+        }
+        
+        function nextMonth() {
+            cancelEditing();
+            if (currentViewMonth === 11) {
+                currentViewMonth = 0;
+                currentViewYear++;
+            } else {
+                currentViewMonth++;
+            }
+            renderCalendar();
+            updateHistory();
+        }
+
+        function updateAll() {
+            renderCalendar();
+            updateStats();
+            updateHistory();
+            updatePredictionInfo();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateAll();
+            document.getElementById('avgCycleStat').addEventListener('click', showEggTrend);
+        });
+        
+        document.getElementById('eggModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('eggModal')) {
+                closeEgg();
+            }
+        });
+        
+        document.addEventListener('click', (e) => {
+            if (isEditing && !e.target.closest('.day-cell') && !e.target.closest('#editingPanel')) {
+                cancelEditing();
+            }
+        });
+    </script>
+</body>
+</html>
