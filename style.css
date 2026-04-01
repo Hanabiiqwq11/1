@@ -1,0 +1,280 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Helvetica Neue', Roboto, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    overflow: hidden;
+    animation: slideUp 0.5s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+header {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    padding: 30px 20px;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 2em;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+
+/* 统计卡片 */
+.stats-card {
+    display: flex;
+    justify-content: space-around;
+    padding: 25px 20px;
+    background: white;
+    border-bottom: 1px solid #f0f0f0;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    text-align: center;
+    flex: 1;
+    min-width: 100px;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.85em;
+    color: #999;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    display: inline-block;
+    font-size: 2em;
+    font-weight: bold;
+    color: #f5576c;
+    margin-right: 4px;
+}
+
+.stat-unit {
+    font-size: 0.85em;
+    color: #999;
+}
+
+/* 预测卡片 */
+.prediction-card {
+    margin: 20px;
+    padding: 20px;
+    background: linear-gradient(135deg, #ffe6f0 0%, #ffe0f0 100%);
+    border-radius: 15px;
+    border-left: 4px solid #f5576c;
+}
+
+.prediction-header {
+    font-weight: bold;
+    color: #f5576c;
+    margin-bottom: 12px;
+    font-size: 1.1em;
+}
+
+.prediction-content p {
+    color: #666;
+    line-height: 1.6;
+}
+
+/* 表单区域 */
+.form-section {
+    padding: 20px;
+    background: #fafafa;
+    margin: 20px;
+    border-radius: 15px;
+}
+
+.form-section h2 {
+    font-size: 1.3em;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #666;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1em;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #f5576c;
+}
+
+/* 按钮样式 */
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(245,87,108,0.3);
+}
+
+.btn-secondary {
+    width: 100%;
+    padding: 10px;
+    background: #f0f0f0;
+    color: #666;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.9em;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background 0.2s;
+}
+
+.btn-secondary:hover {
+    background: #e0e0e0;
+}
+
+.delete-btn {
+    background: #ff4757;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.85em;
+    transition: background 0.2s;
+}
+
+.delete-btn:hover {
+    background: #e84142;
+}
+
+/* 历史记录区域 */
+.history-section {
+    padding: 20px;
+    margin: 20px;
+    margin-top: 0;
+}
+
+.history-section h2 {
+    font-size: 1.3em;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid #f0f0f0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #fafafa;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #666;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #333;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+.empty-state {
+    text-align: center;
+    color: #999;
+    padding: 40px !important;
+}
+
+/* 响应式设计 */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+    
+    .stats-card {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .stat-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 20px;
+    }
+    
+    .stat-label {
+        margin-bottom: 0;
+    }
+    
+    .form-section,
+    .history-section {
+        margin: 15px;
+    }
+    
+    th, td {
+        padding: 10px 8px;
+        font-size: 0.9em;
+    }
+}
